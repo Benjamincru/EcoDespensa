@@ -2,7 +2,7 @@
 
 EcoDespensa es un sistema de gestión inteligente y sostenible para el inventario del hogar. Su objetivo principal es reducir el desperdicio de comida mediante alertas automatizadas de caducidad y listas de compras gestionadas eficientemente.
 
-## Características Principales ✨
+## Características Principales
 
 - **Gestión de Inventario**: Registra y mantén la cuenta de todos tus artículos en un solo lugar.
 - **Alertas de Caducidad Visuales**: Identifica el estado de tus productos mediante colores:
@@ -13,7 +13,7 @@ EcoDespensa es un sistema de gestión inteligente y sostenible para el inventari
 - **Categorías**: Organización simplificada en Lácteos, Frutas, Verduras, Infusiones, etc.
 - **Autenticación Moderna**: Gestión de usuarios basada de manera segura con JWT (JSON Web Tokens) e integración mock con Google.
 
-## Arquitectura y Tecnologías 🛠️
+## Arquitectura y Tecnologías
 
 Este es un proyecto Full-stack (MERN/PERN refactorizado) compuesto por:
 
@@ -22,7 +22,7 @@ Este es un proyecto Full-stack (MERN/PERN refactorizado) compuesto por:
 - **Base de Datos**: Base de datos Relacional (SQL) gestionada por el ORM `Sequelize` con `SQLite`. Permite su uso inmediato sin instalación de motores externos.
 - **Autenticación**: `bcryptjs` y `jsonwebtoken`.
 
-## Instalación y Ejecución Local 🚀
+## Instalación y Ejecución Local
 
 ### Requisitos
 - [Node.js](https://nodejs.org/es/) instalado.
