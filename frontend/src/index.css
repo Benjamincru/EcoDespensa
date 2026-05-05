@@ -213,7 +213,11 @@ body {
     border-right: none !important;
     border-top: 4px solid #2ECC71 !important;
   }
+  .header-logo {
+    order: 1;
+  }
   .header-actions {
+    order: 2;
     gap: 8px;
   }
   .app-header {

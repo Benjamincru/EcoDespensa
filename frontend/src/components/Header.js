@@ -50,64 +50,9 @@ const Header = () => {
 
   return (
     <header className="app-header" ref={headerRef} style={styles.header}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-        <div onClick={() => navigate('/dashboard')} style={{cursor: 'pointer', ...styles.logoContainer}}>
-          <Leaf color="#2ECC71" size={28} />
-          <h1 style={styles.logoText}>EcoDespensa</h1>
-        </div>
-        
-        <div style={styles.actions} className="header-actions">
-          {/* Notifications */}
-          <div style={{ position: 'relative' }}>
-            <button style={styles.iconButton} onClick={() => {setShowNotif(!showNotif); setShowCart(false); setShowProfile(false);}}>
-              <Bell size={22} color={showNotif ? "#2ECC71" : "#777"} />
-            </button>
-            {showNotif && (
-              <div style={{...styles.dropdown, right: '-50px'}}>
-                <div style={styles.dropdownHeader}>Notificaciones</div>
-                <div style={styles.dropdownItem}>
-                  <div style={{color: '#e74c3c', fontWeight: 'bold'}}>¡Atención!</div>
-                  <div style={{fontSize: '13px', color: '#555'}}>Tus manzanas espiran en 3 días.</div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Cart / Shopping List */}
-          <div style={{ position: 'relative' }}>
-            <button style={styles.iconButton} onClick={() => {setShowCart(!showCart); setShowNotif(false); setShowProfile(false);}}>
-              <ShoppingCart size={22} color={showCart ? "#2ECC71" : "#777"} />
-            </button>
-            {showCart && (
-              <div style={{...styles.dropdown, right: '-25px'}}>
-                <div style={styles.dropdownHeader}>Lista de Compras</div>
-                <div style={styles.dropdownItem}><Package size={14}/> Huevos (1 docena)</div>
-                <div style={styles.dropdownItem}><Package size={14}/> Leche Entera</div>
-                <div style={styles.dropdownItem}><Package size={14}/> Aceite de Oliva</div>
-                <div style={{padding: '10px', textAlign: 'center'}}>
-                  <button style={{...styles.dropdownBtn, width: '100%'}}>Ver lista completa</button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Profile */}
-          <div style={{ position: 'relative' }}>
-            <button style={styles.iconButton} onClick={() => {setShowProfile(!showProfile); setShowNotif(false); setShowCart(false);}}>
-              <User size={22} color={showProfile ? "#2ECC71" : "#777"} />
-            </button>
-            {showProfile && (
-              <div style={{...styles.dropdown, right: 0}}>
-                <div style={styles.dropdownHeader}>Mi Cuenta</div>
-                <div style={styles.dropdownItem}>Perfil</div>
-                <div style={styles.dropdownItem}>Configuración</div>
-                <div style={{...styles.dropdownItem, color: '#e74c3c'}} onClick={logout}>
-                  <LogOut size={14} style={{marginRight: '5px'}}/> Cerrar sesión
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+      <div className="header-logo" onClick={() => navigate('/dashboard')} style={{cursor: 'pointer', ...styles.logoContainer}}>
+        <Leaf color="#2ECC71" size={28} />
+        <h1 style={styles.logoText}>EcoDespensa</h1>
       </div>
 
       <form onSubmit={handleSearch} className="search-container" style={styles.searchContainer}>
@@ -120,6 +65,59 @@ const Header = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </form>
+      
+      <div style={styles.actions} className="header-actions">
+        {/* Notifications */}
+        <div style={{ position: 'relative' }}>
+          <button style={styles.iconButton} onClick={() => {setShowNotif(!showNotif); setShowCart(false); setShowProfile(false);}}>
+            <Bell size={22} color={showNotif ? "#2ECC71" : "#777"} />
+          </button>
+          {showNotif && (
+            <div style={{...styles.dropdown, right: '-50px'}}>
+              <div style={styles.dropdownHeader}>Notificaciones</div>
+              <div style={styles.dropdownItem}>
+                <div style={{color: '#e74c3c', fontWeight: 'bold'}}>¡Atención!</div>
+                <div style={{fontSize: '13px', color: '#555'}}>Tus manzanas espiran en 3 días.</div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Cart / Shopping List */}
+        <div style={{ position: 'relative' }}>
+          <button style={styles.iconButton} onClick={() => {setShowCart(!showCart); setShowNotif(false); setShowProfile(false);}}>
+            <ShoppingCart size={22} color={showCart ? "#2ECC71" : "#777"} />
+          </button>
+          {showCart && (
+            <div style={{...styles.dropdown, right: '-25px'}}>
+              <div style={styles.dropdownHeader}>Lista de Compras</div>
+              <div style={styles.dropdownItem}><Package size={14}/> Huevos (1 docena)</div>
+              <div style={styles.dropdownItem}><Package size={14}/> Leche Entera</div>
+              <div style={styles.dropdownItem}><Package size={14}/> Aceite de Oliva</div>
+              <div style={{padding: '10px', textAlign: 'center'}}>
+                <button style={{...styles.dropdownBtn, width: '100%'}}>Ver lista completa</button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Profile */}
+        <div style={{ position: 'relative' }}>
+          <button style={styles.iconButton} onClick={() => {setShowProfile(!showProfile); setShowNotif(false); setShowCart(false);}}>
+            <User size={22} color={showProfile ? "#2ECC71" : "#777"} />
+          </button>
+          {showProfile && (
+            <div style={{...styles.dropdown, right: 0}}>
+              <div style={styles.dropdownHeader}>Mi Cuenta</div>
+              <div style={styles.dropdownItem}>Perfil</div>
+              <div style={styles.dropdownItem}>Configuración</div>
+              <div style={{...styles.dropdownItem, color: '#e74c3c'}} onClick={logout}>
+                <LogOut size={14} style={{marginRight: '5px'}}/> Cerrar sesión
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </header>
   );
 };
