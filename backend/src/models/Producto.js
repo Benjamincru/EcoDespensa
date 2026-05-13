@@ -33,7 +33,7 @@ const Producto = sequelize.define('Producto', {
   },
   fecha_caducidad: {
     type: DataTypes.DATEONLY,
-    allowNull: false
+    allowNull: true
   }
 }, {
   timestamps: false,

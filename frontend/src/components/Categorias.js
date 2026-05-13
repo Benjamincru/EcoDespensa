@@ -1,30 +1,65 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Apple, Carrot, Milk, Wheat, Coffee, Leaf, Archive } from 'lucide-react';
+import { 
+  Apple, Carrot, Milk, Wheat, Coffee, Leaf, Archive, 
+  Package, Beef, HelpCircle, ChevronRight
+} from 'lucide-react';
+import clienteAxios from '../api/axios';
 
-const categoriasPredeterminadas = [
-  { id: 1, nombre: 'Verduras', icon: <Carrot size={40} color="#e67e22"/> },
-  { id: 2, nombre: 'Frutas', icon: <Apple size={40} color="#e74c3c"/> },
-  { id: 3, nombre: 'Lácteos', icon: <Milk size={40} color="#3498db"/> },
-  { id: 4, nombre: 'Cereales', icon: <Wheat size={40} color="#f1c40f"/> },
-  { id: 5, nombre: 'Infusiones', icon: <Coffee size={40} color="#8e44ad"/> },
-  { id: 6, nombre: 'Cuidado Natural', icon: <Leaf size={40} color="#2ECC71"/> },
-  { id: 7, nombre: 'Conservas', icon: <Archive size={40} color="#95a5a6"/> },
-];
+const iconMap = {
+  Milk: <Milk size={32} />,
+  Apple: <Apple size={32} />,
+  Beef: <Beef size={32} />,
+  Package: <Package size={32} />,
+  Coffee: <Coffee size={32} />,
+  Archive: <Archive size={32} />,
+  Carrot: <Carrot size={32} />,
+  Leaf: <Leaf size={32} />,
+  HelpCircle: <HelpCircle size={32} />
+};
 
 const Categorias = () => {
+  const [categorias, setCategorias] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchCats = async () => {
+      try {
+        const res = await clienteAxios.get('/categorias');
+        setCategorias(res.data);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCats();
+  }, []);
+
+  if (loading) return <div style={{padding: '40px', textAlign: 'center'}}>Cargando categorías...</div>;
+
   return (
-    <div>
-      <h2 style={{ marginBottom: '25px' }}>Categorías de tu Despensa</h2>
+    <div className="animate-fade-in">
+      <h2 style={styles.title}>Categorías de tu Despensa</h2>
+      <p style={styles.subtitle}>Explora tus productos por tipo para un mejor control.</p>
+      
       <div style={styles.grid}>
-        {categoriasPredeterminadas.map(cat => (
-          <div key={cat.id} style={styles.card} onClick={() => navigate(`/dashboard?q=${cat.nombre}`)}>
-            <div style={styles.iconContainer}>
-              {cat.icon}
+        {categorias.map(cat => (
+          <div 
+            key={cat.id} 
+            className="premium-card" 
+            style={styles.card} 
+            onClick={() => navigate(`/dashboard?catId=${cat.id}&q=${cat.nombre}`)}
+          >
+            <div style={{...styles.iconWrapper, backgroundColor: 'var(--primary-color)15', color: 'var(--primary-color)'}}>
+              {iconMap[cat.icono] || <Package size={32} />}
             </div>
-            <h3 style={styles.title}>{cat.nombre}</h3>
-            <p style={styles.subtitle}>Ver productos</p>
+            <h3 style={styles.catName}>{cat.nombre}</h3>
+            <div style={styles.cardFooter}>
+              <span>Explorar</span>
+              <ChevronRight size={16} />
+            </div>
           </div>
         ))}
       </div>
@@ -33,33 +68,50 @@ const Categorias = () => {
 };
 
 const styles = {
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-    gap: '20px'
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: '16px',
-    padding: '30px 20px',
-    textAlign: 'center',
-    boxShadow: '0 4px 15px rgba(0,0,0,0.03)',
-    cursor: 'pointer',
-    transition: 'transform 0.2s',
-    border: '1px solid #f0f0f0'
-  },
-  iconContainer: {
-    marginBottom: '15px'
-  },
   title: {
-    fontSize: '18px',
-    color: '#333',
-    margin: '0 0 5px 0'
+    fontSize: '28px',
+    fontWeight: '700',
+    marginBottom: '8px'
   },
   subtitle: {
+    color: 'var(--text-light)',
+    marginBottom: '35px'
+  },
+  grid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+    gap: '25px'
+  },
+  card: {
+    padding: '30px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    cursor: 'pointer',
+    textAlign: 'center'
+  },
+  iconWrapper: {
+    width: '70px',
+    height: '70px',
+    borderRadius: '20px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: '20px'
+  },
+  catName: {
+    fontSize: '18px',
+    fontWeight: '700',
+    marginBottom: '20px',
+    color: 'var(--text-dark)'
+  },
+  cardFooter: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '5px',
+    color: 'var(--primary-color)',
     fontSize: '14px',
-    color: '#aaa',
-    margin: 0
+    fontWeight: '600'
   }
 };
 

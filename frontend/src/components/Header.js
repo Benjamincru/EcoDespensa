@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Leaf, Bell, User, ShoppingCart, Search, LogOut, Package } from 'lucide-react';
+import { Leaf, Bell, User, ShoppingCart, Search, LogOut, Package, AlertCircle } from 'lucide-react';
+import clienteAxios from '../api/axios';
 
 const Header = () => {
   const [showProfile, setShowProfile] = useState(false);
   const [showCart, setShowCart] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [alertas, setAlertas] = useState([]);
+  const [listaCompras, setListaCompras] = useState([]);
   const navigate = useNavigate();
   const headerRef = useRef(null);
 
@@ -20,19 +23,39 @@ const Header = () => {
       }
     };
     
-    const handleScroll = () => {
-      setShowProfile(false);
-      setShowCart(false);
-      setShowNotif(false);
-    };
-
     document.addEventListener('mousedown', handleClickOutside);
-    window.addEventListener('scroll', handleScroll);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
-      window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+
+  useEffect(() => {
+    fetchAlerts();
+    fetchCart();
+    const interval = setInterval(() => {
+      fetchAlerts();
+      fetchCart();
+    }, 60000); // Update every minute
+    return () => clearInterval(interval);
+  }, []);
+
+  const fetchAlerts = async () => {
+    try {
+      const res = await clienteAxios.get('/products/alerts');
+      setAlertas(res.data);
+    } catch (error) {
+      console.error("Error fetching alerts:", error);
+    }
+  };
+
+  const fetchCart = async () => {
+    try {
+      const res = await clienteAxios.get('/list');
+      setListaCompras(res.data);
+    } catch (error) {
+      console.error("Error fetching cart:", error);
+    }
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -48,8 +71,13 @@ const Header = () => {
     navigate('/login');
   };
 
+  const getDaysDiff = (date) => {
+    const diff = new Date(date) - new Date();
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+  };
+
   return (
-    <header className="app-header" ref={headerRef} style={styles.header}>
+    <header className="app-header glass" ref={headerRef} style={styles.header}>
       <div className="header-logo" onClick={() => navigate('/dashboard')} style={{cursor: 'pointer', ...styles.logoContainer}}>
         <Leaf color="#2ECC71" size={28} />
         <h1 style={styles.logoText}>EcoDespensa</h1>
@@ -71,14 +99,35 @@ const Header = () => {
         <div style={{ position: 'relative' }}>
           <button style={styles.iconButton} onClick={() => {setShowNotif(!showNotif); setShowCart(false); setShowProfile(false);}}>
             <Bell size={22} color={showNotif ? "#2ECC71" : "#777"} />
+            {alertas.length > 0 && <span style={styles.notifBadge}>{alertas.length}</span>}
           </button>
           {showNotif && (
             <div style={{...styles.dropdown, right: '-50px'}}>
               <div style={styles.dropdownHeader}>Notificaciones</div>
-              <div style={styles.dropdownItem}>
-                <div style={{color: '#e74c3c', fontWeight: 'bold'}}>¡Atención!</div>
-                <div style={{fontSize: '13px', color: '#555'}}>Tus manzanas espiran en 3 días.</div>
-              </div>
+              {alertas.length === 0 ? (
+                <div style={styles.dropdownItem}>No hay alertas recientes</div>
+              ) : (
+                alertas.map(a => {
+                   const days = getDaysDiff(a.fecha_caducidad);
+                   return (
+                    <div 
+                      key={a.id} 
+                      style={styles.dropdownItem} 
+                      onClick={() => {
+                        navigate(`/dashboard?q=${encodeURIComponent(a.nombre)}`);
+                        setShowNotif(false);
+                      }}
+                    >
+                      <div style={{color: days < 0 ? '#ef4444' : '#f59e0b', fontWeight: 'bold'}}>
+                        {days < 0 ? '¡Caducado!' : '¡Próximo a vencer!'}
+                      </div>
+                      <div style={{fontSize: '13px', color: '#555'}}>
+                        {a.nombre} {days < 0 ? 'venció hace ' + Math.abs(days) : 'vence en ' + days} días.
+                      </div>
+                    </div>
+                   );
+                })
+              )}
             </div>
           )}
         </div>
@@ -87,15 +136,36 @@ const Header = () => {
         <div style={{ position: 'relative' }}>
           <button style={styles.iconButton} onClick={() => {setShowCart(!showCart); setShowNotif(false); setShowProfile(false);}}>
             <ShoppingCart size={22} color={showCart ? "#2ECC71" : "#777"} />
+            {listaCompras.filter(i => !i.comprado).length > 0 && (
+              <span style={styles.notifBadge}>{listaCompras.filter(i => !i.comprado).length}</span>
+            )}
           </button>
           {showCart && (
             <div style={{...styles.dropdown, right: '-25px'}}>
               <div style={styles.dropdownHeader}>Lista de Compras</div>
-              <div style={styles.dropdownItem}><Package size={14}/> Huevos (1 docena)</div>
-              <div style={styles.dropdownItem}><Package size={14}/> Leche Entera</div>
-              <div style={styles.dropdownItem}><Package size={14}/> Aceite de Oliva</div>
+              <div style={styles.cartItemsContainer}>
+                {listaCompras.filter(i => !i.comprado).length === 0 ? (
+                  <div style={styles.dropdownItem}>No hay items pendientes</div>
+                ) : (
+                  listaCompras.filter(i => !i.comprado).slice(0, 5).map(item => (
+                    <div key={item.id} style={styles.dropdownItem}>
+                      <Package size={14} style={{marginRight: '8px'}}/> {item.nombre_producto}
+                    </div>
+                  ))
+                )}
+                {listaCompras.filter(i => !i.comprado).length > 5 && (
+                  <div style={{...styles.dropdownItem, textAlign: 'center', fontSize: '12px', color: '#888'}}>
+                    + {listaCompras.filter(i => !i.comprado).length - 5} más...
+                  </div>
+                )}
+              </div>
               <div style={{padding: '10px', textAlign: 'center'}}>
-                <button style={{...styles.dropdownBtn, width: '100%'}}>Ver lista completa</button>
+                <button 
+                  onClick={() => { navigate('/shopping-list'); setShowCart(false); }}
+                  style={{...styles.dropdownBtn, width: '100%'}}
+                >
+                  Ver lista completa
+                </button>
               </div>
             </div>
           )}
@@ -109,8 +179,8 @@ const Header = () => {
           {showProfile && (
             <div style={{...styles.dropdown, right: 0}}>
               <div style={styles.dropdownHeader}>Mi Cuenta</div>
-              <div style={styles.dropdownItem}>Perfil</div>
-              <div style={styles.dropdownItem}>Configuración</div>
+              <div style={styles.dropdownItem} onClick={() => navigate('/perfil')}>Perfil</div>
+              <div style={styles.dropdownItem} onClick={() => navigate('/perfil#settings')}>Configuración</div>
               <div style={{...styles.dropdownItem, color: '#e74c3c'}} onClick={logout}>
                 <LogOut size={14} style={{marginRight: '5px'}}/> Cerrar sesión
               </div>
@@ -128,9 +198,8 @@ const styles = {
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '15px 30px',
-    backgroundColor: '#FFFFFF',
-    borderBottom: '1px solid #eee',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.02)',
+    backgroundColor: 'rgba(255,255,255,0.8)',
+    borderBottom: '1px solid rgba(0,0,0,0.05)',
     position: 'sticky',
     top: 0,
     zIndex: 100
@@ -149,10 +218,10 @@ const styles = {
   searchContainer: {
     display: 'flex',
     alignItems: 'center',
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#F1F5F9',
     borderRadius: '25px',
     width: '400px',
-    border: '1px solid #eee'
+    border: '1px solid #E2E8F0'
   },
   searchInput: {
     border: 'none',
@@ -160,7 +229,7 @@ const styles = {
     padding: '12px 15px',
     width: '100%',
     outline: 'none',
-    fontSize: '15px'
+    fontSize: '14px'
   },
   actions: {
     display: 'flex',
@@ -171,48 +240,62 @@ const styles = {
     background: 'none',
     border: 'none',
     cursor: 'pointer',
+    position: 'relative',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     padding: '8px',
     borderRadius: '50%',
     transition: 'background 0.2s',
-    outline: 'none'
+  },
+  notifBadge: {
+    position: 'absolute',
+    top: '5px',
+    right: '5px',
+    backgroundColor: '#ef4444',
+    color: 'white',
+    borderRadius: '50%',
+    width: '18px',
+    height: '18px',
+    fontSize: '11px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontWeight: 'bold',
+    border: '2px solid white'
   },
   dropdown: {
     position: 'absolute',
-    top: '40px',
-    width: '260px',
+    top: '50px',
+    width: '280px',
     backgroundColor: 'white',
-    borderRadius: '10px',
-    boxShadow: '0 8px 30px rgba(0,0,0,0.15)',
+    borderRadius: '16px',
+    boxShadow: '0 10px 40px rgba(0,0,0,0.12)',
     overflow: 'hidden',
     zIndex: 200,
-    border: '1px solid #eee'
+    border: '1px solid #F1F5F9'
   },
   dropdownHeader: {
-    padding: '12px 15px',
-    backgroundColor: '#2ECC71',
+    padding: '15px',
+    backgroundColor: 'var(--primary-color)',
     color: 'white',
     fontWeight: '600',
-    fontSize: '14px'
+    fontSize: '15px'
   },
   dropdownItem: {
-    padding: '12px 15px',
-    borderBottom: '1px solid #eee',
+    padding: '15px',
+    borderBottom: '1px solid #F1F5F9',
     fontSize: '14px',
     cursor: 'pointer',
     color: '#444',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px'
+    transition: 'background 0.2s'
   },
   dropdownBtn: {
-    backgroundColor: '#2ECC71',
+    backgroundColor: 'var(--primary-color)',
     color: 'white',
     border: 'none',
-    padding: '8px',
-    borderRadius: '6px',
+    padding: '10px',
+    borderRadius: '8px',
     cursor: 'pointer',
     fontWeight: 'bold'
   }

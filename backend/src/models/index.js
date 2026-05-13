@@ -9,8 +9,8 @@ const HistorialEco = require('./HistorialEco');
 Usuario.hasMany(Producto, { foreignKey: 'usuario_id' });
 Producto.belongsTo(Usuario, { foreignKey: 'usuario_id' });
 
-Categoria.hasMany(Producto, { foreignKey: 'categoria_id' });
-Producto.belongsTo(Categoria, { foreignKey: 'categoria_id' });
+Categoria.hasMany(Producto, { foreignKey: 'categoria_id', as: 'productos' });
+Producto.belongsTo(Categoria, { foreignKey: 'categoria_id', as: 'Categoria' });
 
 Usuario.hasMany(ListaCompras, { foreignKey: 'usuario_id' });
 ListaCompras.belongsTo(Usuario, { foreignKey: 'usuario_id' });

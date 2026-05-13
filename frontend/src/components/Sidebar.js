@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Store, Grid, Info } from 'lucide-react';
+import { Home, ShoppingCart, Grid, Info, User } from 'lucide-react';
 
 const Sidebar = () => {
   return (
@@ -12,13 +12,18 @@ const Sidebar = () => {
           </NavLink>
         </li>
         <li style={styles.navItem}>
-          <NavLink to="/tienda" className={({ isActive }) => "sidebar-link" + (isActive ? " sidebar-link-active" : "")} style={({ isActive }) => isActive ? {...styles.link, ...styles.activeLink} : styles.link}>
-            <Store size={20} /> Tienda
+          <NavLink to="/shopping-list" className={({ isActive }) => "sidebar-link" + (isActive ? " sidebar-link-active" : "")} style={({ isActive }) => isActive ? {...styles.link, ...styles.activeLink} : styles.link}>
+            <ShoppingCart size={20} /> Lista de Compras
           </NavLink>
         </li>
         <li style={styles.navItem}>
           <NavLink to="/categorias" className={({ isActive }) => "sidebar-link" + (isActive ? " sidebar-link-active" : "")} style={({ isActive }) => isActive ? {...styles.link, ...styles.activeLink} : styles.link}>
             <Grid size={20} /> Categorías
+          </NavLink>
+        </li>
+        <li style={styles.navItem}>
+          <NavLink to="/perfil" className={({ isActive }) => "sidebar-link" + (isActive ? " sidebar-link-active" : "")} style={({ isActive }) => isActive ? {...styles.link, ...styles.activeLink} : styles.link}>
+            <User size={20} /> Mi Perfil
           </NavLink>
         </li>
         <li style={styles.navItem}>

@@ -2,8 +2,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import Categorias from './components/Categorias';
+import Profile from './components/Profile';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
+import ShoppingList from './components/ShoppingList';
 
 // Layout wrapper for authenticated pages
 const MainLayout = ({ children }) => {
@@ -29,8 +31,9 @@ function App() {
         
         {/* Authenticated Routes wrapped in Layout */}
         <Route path="/dashboard" element={<MainLayout><Dashboard /></MainLayout>} />
-        <Route path="/tienda" element={<MainLayout><div><h2>Tienda (En desarrollo)</h2></div></MainLayout>} />
+        <Route path="/shopping-list" element={<MainLayout><ShoppingList /></MainLayout>} />
         <Route path="/categorias" element={<MainLayout><Categorias /></MainLayout>} />
+        <Route path="/perfil" element={<MainLayout><Profile /></MainLayout>} />
         <Route path="/sobre-nosotros" element={<MainLayout><div><h2>Sobre Nosotros</h2><p>EcoDespensa es un sistema para reducir el desperdicio de comida.</p></div></MainLayout>} />
       </Routes>
     </Router>
